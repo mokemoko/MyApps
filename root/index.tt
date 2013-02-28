@@ -1,0 +1,7 @@
+[% META
+  title = "トップ"
+%]
+[% WRAPPER wrapper.tt %]
+  <h1>トップ</h1>
+  <hr />
+[% END %]

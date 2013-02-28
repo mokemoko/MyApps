@@ -1,6 +1,9 @@
 package MyApps::Controller::Twitter;
 use Moose;
 use namespace::autoclean;
+use Net::Twitter;
+use Data::Dumper;
+use Encode;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -22,11 +25,24 @@ Catalyst Controller.
 =cut
 
 sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
+  my ($self, $c) = @_;
 
-    $c->response->body('');
+  my $nt = Net::Twitter->new(
+    traits => [qw/OAuth API::REST/],
+    consumer_key => $c->config->{tw_consumer_key},
+    consumer_secret => $c->config->{tw_consumer_secret},
+    access_token => $c->config->{tw_token},
+    access_token_secret => $c->config->{tw_token_secret},
+  );
+
+  #$nt->update('test');
+  $c->stash->{timelines} = [];
+
+  my $tl = $nt->home_timeline({count => 3});
+  foreach my $tl (@$tl) {
+    push @{$c->stash->{timelines}}, Encode::encode('utf8', $tl->{text}); 
+  }
 }
-
 
 =head1 AUTHOR
 

@@ -1,0 +1,12 @@
+[% META
+  title = "投稿一覧"
+%]
+[% WRAPPER wrapper.tt %]
+  <h1>一覧</h1>
+  <hr />
+  [% FOREACH timeline = c.stash.timelines %]
+    <div>
+      [% timeline | html %]
+    </div>
+  [% END %]
+[% END %]

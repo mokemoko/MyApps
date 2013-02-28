@@ -1,0 +1,17 @@
+[% META
+  title = "投稿一覧"
+%]
+[% WRAPPER wrapper.tt %]
+  <h1>一覧</h1>
+  <hr />
+  [% FOREACH diary = c.stash.diaries %]
+    <div id="post_[% diary.id %]">
+      <h3>[% diary.title | html %]</h3>
+      <div>[% diary.text | html | html_line_break %]</div>
+      <br />
+      posted_at: [% diary.posted_at | html %]
+      <a class="btn" id="post_del" value="[% diary.id %]">削除</a>
+      <hr />
+    </div>
+  [% END %]
+[% END %]

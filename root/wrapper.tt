@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>[% template.title | html  IF template.title %]</title>
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/app.js"></script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <ul class="nav">
+          <li class="active"><a href="/">一覧</a></li>
+          <li><a href="#newpost" data-toggle="modal">新規投稿</a></li>
+        </ul>
+      </div>
+    </div>
+    <header></header>
+    <div class="container">
+      [% content %]
+    </div>
+    <div id="newpost" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove-sign"></i></button>
+        <h3 id="modalLabel">新規投稿</h3>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" method="POST" action="/add">
+          <div class="control-group">
+            <label class="control-label" for="inputTitle">Title</label>
+            <div class="controls">
+              <input name="title" type="text" id="inputTitle" placeholder="Title">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="inputText">Text</label>
+            <div class="controls">
+              <textarea name="text" row="5" id="inputText" placeholder="Text"></textarea>
+            </div>
+          </div>
+          <input type="hidden" value="post" name=".submit" />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary" id="modal_post" type="submit">Post</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -27,7 +27,7 @@
         <h3 id="modalLabel">新規投稿</h3>
       </div>
       <div class="modal-body">
-        <form class="form-horizontal" method="POST" action="/add">
+        <form class="form-horizontal" method="POST" action="/diary/add">
           <div class="control-group">
             <label class="control-label" for="inputTitle">Title</label>
             <div class="controls">

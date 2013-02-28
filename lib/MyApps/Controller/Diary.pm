@@ -36,10 +36,9 @@ sub add :Local :Args(0) {
         text => $c->req->param('text') || '',
         posted_at => DateTime->now(),
       });
-    $c->res->redirect('/');
   }  
 
-  $c->res->redirect('/');
+  $c->res->redirect('/diary');
 }
 
 sub delete :Local :Args(0) {
@@ -51,7 +50,7 @@ sub delete :Local :Args(0) {
     $d->delete;
   }  
 
-  $c->res->redirect('/');
+  $c->res->redirect('/diary');
 }
 
 =head1 AUTHOR

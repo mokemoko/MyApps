@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS diary;
+
+CREATE TABLE diary(
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(256),
+  text TEXT,
+  posted_at DATETIME NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  INDEX (posted_at)
+)CHARACTER SET utf8 COLLATE utf8_unicode_ci;

@@ -24,8 +24,35 @@ Catalyst Controller.
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
+    $c->stash->{diaries} = [$c->model('Diary::Diary')->search({}, {order_by => {-desc => 'posted_at'}})];
 }
 
+sub add :Local :Args(0) {
+  my ($self, $c) = @_;
+
+  if($c->req->param('.submit')) {
+    $c->model('Diary::Diary')->create({
+        title => $c->req->param('title') || '',
+        text => $c->req->param('text') || '',
+        posted_at => DateTime->now(),
+      });
+    $c->res->redirect('/');
+  }  
+
+  $c->res->redirect('/');
+}
+
+sub delete :Local :Args(0) {
+  my ($self, $c) = @_;
+
+  my $id = $c->req->param('id');
+
+  if(my $d = $c->model('Diary::Diary')->find($id)){
+    $d->delete;
+  }  
+
+  $c->res->redirect('/');
+}
 
 =head1 AUTHOR
 

@@ -1,3 +1,9 @@
 myapps.conf
 /project
 *.swp
+MYMETA.json
+MYMETA.yml
+Makefile
+META.yml
+/inc
+/blib

@@ -13,7 +13,7 @@ $(function(){
 
     $.ajax({
       type: "POST",
-      url: "./delete",
+      url: "/diary/delete",
       data: {
         id: id,
       },

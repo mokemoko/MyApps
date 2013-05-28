@@ -8,7 +8,7 @@
     <script type="text/javascript" src="/static/js/app.js"></script>
   </head>
   <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse">
       <div class="navbar-inner">
         <ul class="nav">
           <li class="active"><a href="/">HOME</a></li>

@@ -1,0 +1,12 @@
+[% META
+  title = "投稿画像一覧"
+%]
+[% WRAPPER wrapper.tt %]
+  <h1>一覧</h1>
+  <hr />
+  最終投稿日時: 
+  [% last_post | html %];
+  [% FOREACH image = c.stash.images %]
+    [% image | html %]
+  [% END %]
+[% END %]

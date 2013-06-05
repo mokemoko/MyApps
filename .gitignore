@@ -1,4 +1,5 @@
-myapps.conf
+/myapps
+/myapps.conf
 /project
 *.swp
 MYMETA.json

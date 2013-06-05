@@ -90,9 +90,9 @@ sub test :Local :Args(0) {
 sub add :Local :Args(0) {
   my ($self, $c) = @_;
 
-  if($c->req->param('.submit')) {
+  if($c->req->param('.submit') && $c->req->param('name')) {
     $c->model('Image::Artist')->create({
-        name => $c->req->param('name') || '',
+        name => $c->req->param('name'),
         created_at => DateTime->now(),
       });
   }  

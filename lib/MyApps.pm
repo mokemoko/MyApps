@@ -21,6 +21,7 @@ use Catalyst qw/
     ConfigLoader
     Static::Simple
 /;
+use Log::Log4perl::Catalyst;
 
 extends 'Catalyst';
 
@@ -40,6 +41,10 @@ __PACKAGE__->config(
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
     enable_catalyst_header => 1, # Send X-Catalyst header
+);
+
+__PACKAGE__->log(
+  Log::Log4perl::Catalyst->new("$FindBin::Bin/../config/log4perl.conf")
 );
 
 # Start the application

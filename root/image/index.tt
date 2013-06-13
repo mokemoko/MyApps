@@ -4,9 +4,16 @@
 [% WRAPPER wrapper.tt %]
   <h1>一覧</h1>
   <hr />
-  最終投稿日時: 
-  [% last_post | html %];
-  [% FOREACH image = c.stash.images %]
-    [% image | html %]
-  [% END %]
+  <table>
+    <tr>
+      <th>aid</th>
+      <th>gid</th>
+    </tr>
+    [% FOREACH image = c.stash.images %]
+      <tr>
+      <td>[% image.artist.id | html %]</td>
+      <td>[% image.gid | html %]</td>
+      </tr>
+    [% END %]
+  </table>
 [% END %]

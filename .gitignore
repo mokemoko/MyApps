@@ -1,10 +1,12 @@
 /myapps
 /myapps.conf
 /project
+/inc
+/blib
+/log
 *.swp
 MYMETA.json
 MYMETA.yml
 Makefile
 META.yml
-/inc
-/blib
+/root/static/images/

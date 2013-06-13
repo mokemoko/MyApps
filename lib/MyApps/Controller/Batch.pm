@@ -83,6 +83,7 @@ sub getImages :Private {
 
         $c->model('Image::Image')->create({
             gid => $gid,
+            aid => $artist->id,
             path => $path,
             posted_at => $posted,
           });
@@ -91,6 +92,7 @@ sub getImages :Private {
         warn "ERROR: $gid is not found.\n";
       }
       $dt = $dt->delete;
+      sleep 1;
     }
     $mt = $mt->delete;
   }
@@ -106,16 +108,19 @@ sub saveImage {
 
   # ディレクトリが存在しなければ作成
   my $dir = $c->config->{image_writeout_dir} . $artist;
+  my $rel_dir = $artist . '/' . basename($url);
   mkdir $dir unless (-d $dir);
 
   my $path = $dir . '/' . basename($url);
-  warn LWP::Simple->getstore($url, basename($url));
-  #unless (LWP::Simple->getstore($url, $path)) {
-  #  warn("failed store $url to $path");
-  #  return undef;
-  #}
 
-  return $path;
+  # 何故かLWP::Simple::getで501が返ってくるので暫定的にwgetを使用
+  warn $url;
+  if (system("wget -O $path $url > /dev/null") == -1) {
+    warn("failed store $url to $path");
+    return undef;
+  }
+
+  return $rel_dir;
 }
 
 =head1 AUTHOR

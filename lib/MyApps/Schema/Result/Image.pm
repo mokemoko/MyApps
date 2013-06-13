@@ -67,6 +67,8 @@ __PACKAGE__->table("images");
 __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
+  "aid",
+  { data_type => "integer", is_nullable => 1 },
   "gid",
   { data_type => "integer", is_nullable => 1 },
   "path",
@@ -99,4 +101,7 @@ __PACKAGE__->set_primary_key("id");
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
+
+__PACKAGE__->belongs_to(artist => 'MyApps::Schema::Result::Artist', 'aid');
+
 1;

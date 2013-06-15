@@ -55,6 +55,18 @@ __PACKAGE__->table("images");
   is_nullable: 1
   size: 256
 
+=head2 thumb_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 512
+
+=head2 original_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 512
+
 =head2 posted_at
 
   data_type: 'timestamp'
@@ -73,6 +85,10 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 1 },
   "path",
   { data_type => "varchar", is_nullable => 1, size => 256 },
+  "thumb_url",
+  { data_type => "varchar", is_nullable => 1, size => 512 },
+  "original_url",
+  { data_type => "varchar", is_nullable => 1, size => 512 },
   "posted_at",
   {
     data_type => "timestamp",

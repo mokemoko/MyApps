@@ -27,7 +27,7 @@ Catalyst Controller.
 sub index :Path :Args(0) {
   my ($self, $c) = @_;
 
-  $c->stash->{images} = [$c->model('Image::Image')->search({}, {order_by => {-desc => 'posted_at'}})];
+  $c->stash->{images} = [$c->model('Image::Image')->search({}, {rows => 50, page => 1, order_by => {-desc => 'posted_at'}})];
 }
 
 sub list :Local :Args(0) {

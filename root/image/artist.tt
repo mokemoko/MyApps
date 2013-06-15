@@ -12,7 +12,7 @@
   [% ELSE %]
     <a href="#add" data-toggle="modal">追加</a><br />
     [% FOREACH artist = c.stash.artists %]
-      [% artist.name | html %]
+      [% artist.name | html %]<br />
     [% END %]
 
     <div id="add" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">

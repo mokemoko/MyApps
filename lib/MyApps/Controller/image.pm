@@ -32,11 +32,13 @@ sub index :Path :Args(0) {
 
 sub list :Local :Args(0) {
   my ($self, $c) = @_;
+  my $page = $c->req->param('page') || 1;
+
   if ($c->req->env->{HTTP_X_FORWARDED_FOR} || !$c->req->param('mode')) {
     $c->res->redirect('/image/');
   }
 
-  $c->stash->{images} = [$c->model('Image::Image')->search({}, {order_by => {-desc => 'posted_at'}})];
+  $c->stash->{images} = [$c->model('Image::Image')->search({}, {rows => 50, page => $page, order_by => {-desc => 'gid'}})];
 }
 
 # 追加

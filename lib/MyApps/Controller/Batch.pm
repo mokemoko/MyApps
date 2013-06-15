@@ -25,6 +25,59 @@ Catalyst Controller.
 
 =cut
 
+# サムネURLのみ取得
+sub getThumbs :Private {
+  my ($self, $c) = @_;
+  warn "start getThumbs";
+
+  my $domain = $c->config->{image_domain};
+  my @artists = $c->model('Image::Artist')->all;
+
+  foreach my $artist (@artists) {
+    my $an = $artist->name;
+    warn "start get $an thumbs";
+
+    my $url = $domain . '/post/index?tags=' . $an;
+    my $ua = LWP::UserAgent->new('agent' => 'Mozilla/5.0 (Windows NT 6.2; rv:21.0) Gecko/20130314 Firefox/21.0');
+    my $content = $ua->get($url)->content;
+
+    my $mt = HTML::TreeBuilder->new;
+    $mt->parse($content);
+    $mt->eof();
+
+    my @items = $mt->look_down('class', 'content')->find('span');
+
+    # ヘッダの4個を削除
+    splice(@items, 0, 4);
+
+    foreach my $item (@items) {
+      my $elem = $item->find('a');
+      next if(!$elem);
+
+      my $href = $elem->attr('href');
+      my $gid = basename($href);
+
+      # IDが既にDBに存在すれば飛ばす
+      next if ($c->model('Image::Image')->find({gid => $gid}));
+
+      my $thumb = $elem->find('img');
+      my $tu = $thumb->attr('src');
+      my $path = $c->config->{image_writeout_dir} . 'thumb/' . $gid . '.jpg';
+      $ua->get($tu, ':content_file' => $path);
+
+      $c->model('Image::Image')->create({
+          gid => $gid,
+          aid => $artist->id,
+          thumb_url  => $tu,
+        });
+      warn "insert $gid : $tu\n";
+    }
+    $mt = $mt->delete;
+    sleep 1;
+  }
+  warn "end getThumbs";
+}
+
 # 画像取得処理
 sub getImages :Private {
   my ($self, $c) = @_;

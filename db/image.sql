@@ -15,6 +15,8 @@ CREATE TABLE images(
   aid INTEGER,
   gid INTEGER,
   path VARCHAR(256),
+  thumb_url VARCHAR(512),
+  original_url VARCHAR(512),
   posted_at TIMESTAMP NOT NULL,
   INDEX (posted_at)
 )CHARACTER SET utf8 COLLATE utf8_unicode_ci;

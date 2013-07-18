@@ -89,6 +89,11 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 512 },
   "original_url",
   { data_type => "varchar", is_nullable => 1, size => 512 },
+  "stat",
+  { data_type => "integer",
+    default_value => 1,
+    is_nullable => 0,
+  },
   "posted_at",
   {
     data_type => "timestamp",

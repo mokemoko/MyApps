@@ -33,12 +33,23 @@ sub index :Path :Args(0) {
 sub list :Local :Args(0) {
   my ($self, $c) = @_;
   my $page = $c->req->param('page') || 1;
+  my $mode = $c->req->param('mode');
+  my $aid = $c->req->param('aid');
 
-  if ($c->req->env->{HTTP_X_FORWARDED_FOR} || !$c->req->param('mode')) {
+  if ($c->req->env->{HTTP_X_FORWARDED_FOR} || !defined $mode) {
     $c->res->redirect('/image/');
   }
 
-  $c->stash->{images} = [$c->model('Image::Image')->search({}, {rows => 50, page => $page, order_by => {-desc => 'gid'}})];
+  my $query = {};
+  $query->{'aid'} = ($aid =~ /^[0-9]+/ ? $aid : undef) if $aid;
+
+  if ($mode eq '1' ){
+    $query->{'stat'} = {'>=' => 1};
+  } elsif ($mode eq '2'){
+    $query->{'stat'} = {'>=' => 2};
+  }
+  
+  $c->stash->{images} = [$c->model('Image::Image')->search($query, {rows => 50, page => $page, order_by => {-desc => 'gid'}})];
 }
 
 # 追加
@@ -88,6 +99,20 @@ sub imgnum :Local :Args(0) {
         }
       }
     }
+  }
+}
+
+sub ignore_image :Local :Args(0) {
+  my ($self, $c) = @_;
+
+  my $gid = $c->req->param('gid');
+  if($c->req->param('.submit') && $gid) {
+    my $image = $c->model('Image::Image')->find({gid => $gid});
+    $image->update({stat => 0}) if $image;
+    $c->response->body($gid);
+  } else {
+    $c->response->body('');
+    $c->response->status(404);
   }
 }
 

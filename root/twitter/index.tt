@@ -5,8 +5,9 @@
   <h1>一覧</h1>
   <hr />
   [% FOREACH timeline = c.stash.timelines %]
-    <div>
-      [% timeline | html %]
-    </div>
+    <hr />
+    [% FOREACH node = timeline %]
+      [% node | html %]<br />
+    [% END %]
   [% END %]
 [% END %]

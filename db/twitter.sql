@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS twitter;
+
+CREATE TABLE twitter(
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  word VARCHAR(32),
+  num INTEGER,
+  posted_at DATETIME NOT NULL,
+  INDEX (num)
+)CHARACTER SET utf8 COLLATE utf8_unicode_ci;

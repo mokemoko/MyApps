@@ -24,6 +24,44 @@ Catalyst Controller.
 =head2 index
 
 =cut
+sub add :Path :Args(0) {
+  my ($self, $c) = @_;
+  my $user_name = $c->req->param('user_name');
+
+  if ($user_name) {
+    my $nt = Net::Twitter->new(
+      traits => [qw/API::RESTv1_1/],
+      consumer_key => $c->config->{tw_consumer_key},
+      consumer_secret => $c->config->{tw_consumer_secret},
+      access_token => $c->config->{tw_token},
+      access_token_secret => $c->config->{tw_token_secret},
+    );
+
+    my $mec = Text::MeCab->new();
+    my $encoding = Encode::find_encoding( Text::MeCab::ENCODING );
+
+    my $tl = $nt->user_timeline({screen_name => $user_name, count => 1});
+    foreach my $tl (@$tl) {
+      my $timeline = [];
+      my $text = Encode::encode('utf8', $tl->{text});
+      warn 'insert: ' . $text;
+      for (my $n = $mec->parse($text); $n; $n = $n->next) {
+        next if ($n->stat =~ /[23]/);
+
+        my $surface = $n->surface;
+        my @feature = split(/,/, $encoding->decode($n->feature));
+        my $hinshi = sprintf("%s", $feature[0]);
+        #my $num = sprintf("%d", $feature[]);
+
+        $c->model('Twitter::Twitter')->create({
+            word => $surface,
+            num  => 1 || 0,
+            posted_at => DateTime->now(),
+          });
+      }
+    }
+  }
+}
 
 sub index :Path :Args(0) {
   my ($self, $c) = @_;

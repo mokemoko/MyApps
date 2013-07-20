@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS mecab;
+
+CREATE TABLE mecab(
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  word VARCHAR(64) NOT NULL,
+  num INTEGER,
+  domain VARCHAR(256) NOT NULL,
+  posted_at DATETIME NOT NULL,
+  INDEX (word, domain)
+)CHARACTER SET utf8 COLLATE utf8_unicode_ci;

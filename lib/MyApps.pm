@@ -44,7 +44,7 @@ __PACKAGE__->config(
 );
 
 __PACKAGE__->log(
-  Log::Log4perl::Catalyst->new("$FindBin::Bin/../config/log4perl.conf")
+  #Log::Log4perl::Catalyst->new("$FindBin::Bin/../config/log4perl.conf")
 );
 
 # Start the application

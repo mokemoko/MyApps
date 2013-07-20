@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>[% template.title | html  IF template.title %]</title>
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/app.js"></script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse">
+      <div class="navbar-inner">
+        <ul class="nav">
+          <li class="active"><a href="/">HOME</a></li>
+          <li><a href="/twitter/hoge">一覧</a></li>
+        </ul>
+      </div>
+    </div>
+    <header></header>
+    <div class="container">
+      [% content %]
+    </div>
+  </body>
+</html>

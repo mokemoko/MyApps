@@ -1,0 +1,49 @@
+[% META
+  title = "一覧"
+%]
+[% WRAPPER wrapper2.tt %]
+<form class="form-search">
+  <input type="text" class="input-medium search-query" placeholder="input target page url" name="url">
+  <button type="submit" class="btn">Search</button>
+</form>
+<hr />
+<p><a href="[% c.stash.url %]">[% c.stash.url %]</a> 中のキーワード</p>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>rank</th>
+      <th>word</th>
+      <th>freq</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH word = c.stash.words %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% word.word %]</td>
+      <td>[% word.count %]</td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+
+関連サイト
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>rank</th>
+      <th>url</th>
+      <th>rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH site = c.stash.sites %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td><a href="[% site.url %]">[% site.url %]</a></td>
+      <td>[% site.rate %]</td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[% END %]

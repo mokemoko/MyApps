@@ -61,7 +61,8 @@ sub add :Local :Args(0) {
         name => $c->req->param('name'),
         created_at => DateTime->now(),
       });
-  }  
+    $c->response->body('200');
+  }
 }
 
 # 一覧表示

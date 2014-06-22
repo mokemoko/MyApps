@@ -51,6 +51,7 @@ Attempt to render a view, if needed.
 
 sub end : ActionClass('RenderView') {}
 
+
 =head1 AUTHOR
 
 Catalyst developer

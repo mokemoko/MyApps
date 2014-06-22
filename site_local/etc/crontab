@@ -1,0 +1,2 @@
+#
+* 0,12 * * * /home/webservice/projects/MyApps/script/batch.pl getThumbs

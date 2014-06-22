@@ -1,0 +1,22 @@
+[% META
+  title = "一覧"
+%]
+<h1>一覧</h1>
+登録Tel: 05031595887
+<hr />
+<table>
+  <tr>
+    <th>id</th>
+    <th>店舗名</th>
+    <th>電話番号</th>
+    <th>登録状況</th>
+  </tr>
+  [% FOREACH shop = c.stash.shops %]
+    <tr>
+    <td>[% shop.id | html %]</td>
+    <td>[% shop.name | html %]</td>
+    <td>[% shop.tel | html %]</td>
+    <td>[% shop.flg ? "完" : "未" %]</td>
+    </tr>
+  [% END %]
+</table>

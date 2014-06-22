@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+<Say voice="woman" language="ja-jp">街のお店情報 掲載登録テスト用番号です。</Say>
+<Say voice="woman" language="ja-jp">[% shop.name %]様 お電話ありがとうございます。</Say>
+<Gather timeout="30" numDigits="1" action="/twillio/req2" method="GET">
+<Say voice="woman" language="ja-jp">おかけになった番号で登録される場合は1を、やめる場合はその他のボタンを押してください。</Say>
+</Gather>
+</Response>

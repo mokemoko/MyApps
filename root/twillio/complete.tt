@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+<Say voice="woman" language="ja-jp">登録が完了しました。</Say>
+<Say voice="woman" language="ja-jp">お電話ありがとうございました。</Say>
+</Response>
+

@@ -6,8 +6,6 @@
   <hr />
   [% FOREACH timeline = c.stash.timelines %]
     <hr />
-    [% FOREACH node = timeline %]
-      [% node | html %]<br />
-    [% END %]
+    [% timeline | html %]<br />
   [% END %]
 [% END %]

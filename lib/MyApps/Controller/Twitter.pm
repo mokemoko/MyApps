@@ -32,46 +32,24 @@ sub index :Path :Args(0) {
   my ($self, $c) = @_;
 
   my $nt = Net::Twitter->new(
-    traits => [qw/API::RESTv1_1/],
+    traits => [qw/API::RESTv1_1 API::Search WrapError/],
     consumer_key => $c->config->{tw_consumer_key},
     consumer_secret => $c->config->{tw_consumer_secret},
     access_token => $c->config->{tw_token},
     access_token_secret => $c->config->{tw_token_secret},
+    ssl => 1,
   );
-
-  my $mec = Text::MeCab->new();
-  my $encoding = Encode::find_encoding( Text::MeCab::ENCODING );
 
   #$nt->update('test');
   $c->stash->{timelines} = [];
 
-  #my $tl = $nt->home_timeline({count => 3});
-  my $tl = $nt->user_timeline({screen_name => 'healer0120', count => 1});
-  foreach my $tl (@$tl) {
-    my $timeline = [];
-    my $text = Encode::encode('utf8', $tl->{text});
-    #warn $text;
-    my $n = $mec->parse($text);
-    my $str = $n->surface;
-    my @feature = split(/,/, $encoding->decode($n->feature));
-    my $prev_hinshi = sprintf("%s", $feature[0]);
-    $n = $n->next;
-    for (; $n; $n = $n->next) {
-      next if ($n->stat =~ /[23]/);
-      my $surface = $n->surface;
-      @feature = split(/,/, $encoding->decode($n->feature));
-      my $hinshi = sprintf("%s", $feature[0]);
-      if ($hinshi ne $prev_hinshi) {
-        push @$timeline, $str; 
-        $str = '';
-        warn $hinshi;
-      }
-      $str .= $surface;
-      $prev_hinshi = $hinshi;
-    }
-    push @$timeline, $str; 
-    push @{$c->stash->{timelines}}, $timeline; 
-  }
+  #my $tl = $nt->home_timeline({count => 20});
+  my $tl = $nt->search({q=>"リクルート", lang=>"ja", page=>1, rpp=>100});
+  #foreach my $tl (@$tl) {
+  #  my $text = Encode::encode('utf8', $tl->{text});
+  #  next if ($text =~ m/艦これ/);
+  #  push @{$c->stash->{timelines}}, $text; 
+  #}
 }
 
 sub hoge :Local :Args(0) {

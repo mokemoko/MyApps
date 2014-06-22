@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+<Say voice="woman" language="ja-jp">街のお店情報 掲載登録テスト用番号です。</Say>
+<Say voice="woman" language="ja-jp">電話番号の確認ができませんでした。</Say>
+<Say voice="woman" language="ja-jp">電話番号が非通知設定となっていないかご確認ください。</Say>
+</Response>

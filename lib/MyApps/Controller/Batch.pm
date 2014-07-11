@@ -61,7 +61,7 @@ sub getThumbs :Private {
       next if ($c->model('Image::Image')->find({gid => $gid}));
 
       my $thumb = $elem->find('img');
-      my $tu = $thumb->attr('src');
+      (my $tu = $thumb->attr('src')) =~ s/^\/\//http:\/\//;
       my $path = $c->config->{image_writeout_dir} . 'thumb/' . $gid . '.jpg';
       $ua->get($tu, ':content_file' => $path);
 

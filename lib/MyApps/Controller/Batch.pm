@@ -4,7 +4,10 @@ use namespace::autoclean;
 use LWP::UserAgent;
 use LWP::Simple;
 use HTML::TreeBuilder;
+use HTML::TreeBuilder::LibXML;
+use Web::Scraper;
 use File::Basename;
+use File::Path;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -25,6 +28,8 @@ Catalyst Controller.
 
 =cut
 
+our $ua = LWP::UserAgent->new('agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0');
+
 # サムネURLのみ取得
 sub getThumbs :Private {
   my ($self, $c) = @_;
@@ -37,43 +42,48 @@ sub getThumbs :Private {
     my $an = $artist->name;
     warn "start get $an thumbs\n";
 
-    my $url = $domain . '/post/index?tags=' . $an;
-    my $ua = LWP::UserAgent->new('agent' => 'Mozilla/5.0 (Windows NT 6.2; rv:21.0) Gecko/20130314 Firefox/21.0');
-    my $content = $ua->get($url)->content;
+    eval {
+      my $url = $domain . '/post/index?tags=' . $an;
+      my $content = $ua->get($url)->content;
 
-    my $mt = HTML::TreeBuilder->new;
-    $mt->parse($content);
-    $mt->eof();
+      my $mt = HTML::TreeBuilder->new;
+      $mt->parse($content);
+      $mt->eof();
 
-    my @items = $mt->look_down('class', 'content')->find('span');
+      my @items = $mt->look_down('class', 'content')->find('span');
 
-    # ヘッダの4個を削除
-    splice(@items, 0, 4);
+      # ヘッダの4個を削除
+      splice(@items, 0, 4);
 
-    foreach my $item (@items) {
-      my $elem = $item->find('a');
-      next if(!$elem);
+      foreach my $item (@items) {
+        my $elem = $item->find('a');
+        next if(!$elem);
 
-      my $href = $elem->attr('href');
-      my $gid = basename($href);
+        my $href = $elem->attr('href');
+        my $gid = basename($href);
 
-      # IDが既にDBに存在すれば飛ばす
-      next if ($c->model('Image::Image')->find({gid => $gid}));
+        # IDが既にDBに存在すれば飛ばす
+        next if ($c->model('Image::Image')->find({gid => $gid}));
 
-      my $thumb = $elem->find('img');
-      (my $tu = $thumb->attr('src')) =~ s/^\/\//http:\/\//;
-      my $path = $c->config->{image_writeout_dir} . 'thumb/' . $gid . '.jpg';
-      $ua->get($tu, ':content_file' => $path);
+        my $thumb = $elem->find('img');
+        (my $tu = $thumb->attr('src')) =~ s/^\/\//http:\/\//;
+        my $ou = $self->getOriginURL($c, $tu);
 
-      $c->model('Image::Image')->create({
-          gid => $gid,
-          aid => $artist->id,
-          thumb_url  => $tu,
-        });
-      warn "insert $gid : $tu\n";
+        $c->model('Image::Image')->create({
+            gid => $gid,
+            aid => $artist->id,
+            thumb_url  => $self->saveImage($c, $tu),
+            original_url  => $self->saveImage($c, $ou),
+          });
+        warn "insert $gid : $tu\n";
+      }
+      $mt = $mt->delete;
+      sleep 1;
+    };
+
+    if ($@) {
+      warn "NG: unexpected error has occured !!";
     }
-    $mt = $mt->delete;
-    sleep 1;
   }
   warn "end getThumbs\n";
 }
@@ -88,50 +98,117 @@ sub getImages :Private {
 
   my $url = $domain . '/post/show/' . $gid;
   warn "target = $url\n";
-  #my $ua = LWP::UserAgent->new('agent' => 'Mozilla/5.0 (Windows NT 6.2; rv:21.0) Gecko/20130314 Firefox/21.0');
-  my $ua = LWP::UserAgent->new;
   my $content = $ua->get($url)->content;
 
   my $mt = HTML::TreeBuilder->new;
   $mt->parse($content);
   $mt->eof();
 
-  use Data::Dumper;
-  warn Dumper($mt->as_text());
   ## 投稿日
   #my $stat = $mt->look_down(_tag => 'a', title => qr(^\d{4}-));
   #my $posted = $stat ? $stat->attr('title') : undef;
 
   # 画像URL
   my $ie = $mt->look_down(_tag => 'a', title => qr(^\d{4}-));
-  warn Dumper($ie);
 
   $mt = $mt->delete;
   warn "end getImages\n";
 }
 
+sub getOriginURL {
+  my ($self, $c, $thumb) = @_;
+  $thumb =~ s/^(.*)c\d?(\.san.*)preview\/(.*)$/$1cs$2$3/;
+
+  # 存在チェック
+  $thumb =~ s/.jpg/.png/ unless $ua->head($thumb)->is_success;
+
+  warn "ERROR: ORIGINAL IMAGE NOT FOUND $thumb" unless $ua->head($thumb);
+
+  return $thumb;
+}
+
 # URLで渡された画像を保存
 sub saveImage {
-  my $self   = shift;
-  my $c      = shift;
-  my $artist = shift || '__OTHER__';
-  my $url    = shift;
+  my ($self, $c, $target) = @_;
+
+  my $uri = URI->new($target);
+  my $path = $c->config->{image_writeout_dir} . $uri->path;
+  (my $dir = $path) =~ s/[^\/]*$//;
 
   # ディレクトリが存在しなければ作成
-  my $dir = $c->config->{image_writeout_dir} . $artist;
-  my $rel_dir = $artist . '/' . basename($url);
-  mkdir $dir unless (-d $dir);
+  mkpath $dir unless (-d $dir);
 
-  my $path = $dir . '/' . basename($url);
+  $ua->get($target, ':content_file' => $path);
 
-  # 何故かLWP::Simple::getで501が返ってくるので暫定的にwgetを使用
-  warn $url;
-  if (system("wget -O $path $url > /dev/null") == -1) {
-    warn("failed store $url to $path");
-    return undef;
+  return $uri->path;
+}
+
+# Amazon仕入商材チェック
+sub getStocks :Private {
+  my ($self, $c) = @_;
+  my $model = $c->model('Image::Stock');
+
+  $model->update_all({flg => 0});
+
+  my $scraper = scraper {
+    process 'li.s-result-item a.s-access-detail-page', 'items[]' => { title => 'TEXT', link  => '@href' };
+  };
+  $scraper->user_agent($ua);
+
+  my $res = $scraper->scrape(URI->new($c->config->{amazon_url}));
+
+  foreach my $item (@{$res->{items}}) {
+    my $rec = $model->find({title => $item->{title}})
+      || $model->create($item);
+
+    $rec->update({flg => 1});
   }
+}
 
-  return $rel_dir;
+# 移行用
+sub doTransrate :Private {
+  my ($self, $c) = @_;
+  my @all = $c->model('Image::Image')->all;
+
+  my $url_base = "https://cs.sankakucomplex.com";
+  my $count = 0;
+
+  foreach my $rec (@all) {
+    my $gid = $rec->gid;
+
+    my $ou = $rec->original_url;
+    my $path = $c->config->{image_writeout_dir} . $ou;
+
+    next if (-f $path);
+
+    warn "file($path) not found. retry getting image\n";
+
+    $ou =~ s/\.jpg/.png/;
+    $path =~ s/\.jpg/.png/;
+    my $url = $url_base . $ou;
+
+    unless ($ua->head($url)->is_success) {
+      warn "ERROR: can't download $url\n";
+      $ou =~ s/\.png/.gif/;
+      $path =~ s/\.png/.gif/;
+      $url = $url_base . $ou;
+
+      unless ($ua->head($url)->is_success) {
+        warn "ERROR: can't download $url\n";
+        next;
+      }
+    }
+
+    $ua->get($url, ':content_file' => $path);
+
+    $rec->update({
+        original_url  => $ou,
+      });
+
+    warn "transrate $gid \n";
+
+    sleep 1;
+  }
 }
 
 =head1 AUTHOR

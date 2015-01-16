@@ -50,6 +50,14 @@ sub list :Local :Args(0) {
   }
   
   $c->stash->{images} = [$c->model('Image::Image')->search($query, {rows => 50, page => $page, order_by => {-desc => 'gid'}})];
+
+  $c->stash->{stocks} = [$c->model('Image::Stock')->search({flg => 1})];
+}
+
+sub detail :Local :Args(1) {
+  my ($self, $c, $arg) = @_;
+
+  $c->stash->{image} = $c->model('Image::Image')->find({gid => $arg});
 }
 
 # 追加

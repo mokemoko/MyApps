@@ -7,7 +7,14 @@ use Catalyst::Stats;
 
 my $target = $ARGV[0] || '';
 
-unless ($target eq 'getImages' || $target eq 'getThumbs') {
+my $allow = {
+  getImages => 1,
+  getThumbs => 1,
+  getStocks => 1,
+  doTransrate => 1,
+};
+
+unless ($allow->{$target}) {
   print "invalid argument\n";
   exit;
 }

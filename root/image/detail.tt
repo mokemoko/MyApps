@@ -1,0 +1,10 @@
+[% META
+  title = "詳細"
+%]
+[% WRAPPER wrapper.tt %]
+  [% base = "/static/images" %]
+  [% image = c.stash.image %]
+  <a href="[% c.config.image_domain _ '/post/show/' _ image.gid %]">
+    <img src="[% base _ image.original_url %]" />
+  </a>
+[% END %]

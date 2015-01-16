@@ -32,7 +32,8 @@ sub index :Path :Args(0) {
   my ($self, $c) = @_;
 
   my $nt = Net::Twitter->new(
-    traits => [qw/API::RESTv1_1 API::Search WrapError/],
+    #traits => [qw/API::RESTv1_1 API::Search WrapError/],
+    traits => [qw/API::RESTv1_1  WrapError/],
     consumer_key => $c->config->{tw_consumer_key},
     consumer_secret => $c->config->{tw_consumer_secret},
     access_token => $c->config->{tw_token},
@@ -43,8 +44,8 @@ sub index :Path :Args(0) {
   #$nt->update('test');
   $c->stash->{timelines} = [];
 
-  #my $tl = $nt->home_timeline({count => 20});
-  my $tl = $nt->search({q=>"リクルート", lang=>"ja", page=>1, rpp=>100});
+  #my $tl = $nt->search({q=>"リクルート", lang=>"ja", page=>1, rpp=>100});
+  my $tl = $nt->home_timeline({count => 20});
   #foreach my $tl (@$tl) {
   #  my $text = Encode::encode('utf8', $tl->{text});
   #  next if ($text =~ m/艦これ/);

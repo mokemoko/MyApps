@@ -2,11 +2,14 @@
   title = "一覧"
 %]
 [% WRAPPER wrapper.tt %]
-  [% base = "/static/images/" %]
+  [% FOREACH stock = c.stash.stocks %]
+    <a href="[% stock.link %]">[% stock.title %]</a><br />
+  [% END %]
+  [% base = "/static/images" %]
   [% FOREACH image = c.stash.images %]
-    <span id="[% image.gid %]" class="controllable" style="position:relative">
-    <a href="[% c.config.image_domain _ '/post/show/' _ image.gid %]">
-      <img src="[% base _ 'thumb/' _ image.gid _ '.jpg' %]" />
+    <span id="[% image.gid %]" class="controllable" style="position:relative;">
+    <a href="[% './detail/' _ image.gid %]">
+      <img src="[% base _ image.thumb_url %]" style="height: 256px;"/>
     </a>
     </span>
   [% END %]

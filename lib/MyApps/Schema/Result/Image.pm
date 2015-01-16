@@ -44,6 +44,11 @@ __PACKAGE__->table("images");
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 aid
+
+  data_type: 'integer'
+  is_nullable: 1
+
 =head2 gid
 
   data_type: 'integer'
@@ -55,17 +60,23 @@ __PACKAGE__->table("images");
   is_nullable: 1
   size: 256
 
+=head2 original_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 512
+
 =head2 thumb_url
 
   data_type: 'varchar'
   is_nullable: 1
   size: 512
 
-=head2 original_url
+=head2 stat
 
-  data_type: 'varchar'
-  is_nullable: 1
-  size: 512
+  data_type: 'integer'
+  default_value: 1
+  is_nullable: 0
 
 =head2 posted_at
 
@@ -85,15 +96,12 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 1 },
   "path",
   { data_type => "varchar", is_nullable => 1, size => 256 },
-  "thumb_url",
-  { data_type => "varchar", is_nullable => 1, size => 512 },
   "original_url",
   { data_type => "varchar", is_nullable => 1, size => 512 },
+  "thumb_url",
+  { data_type => "varchar", is_nullable => 1, size => 512 },
   "stat",
-  { data_type => "integer",
-    default_value => 1,
-    is_nullable => 0,
-  },
+  { data_type => "integer", default_value => 1, is_nullable => 0 },
   "posted_at",
   {
     data_type => "timestamp",
@@ -116,13 +124,10 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key("id");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-05-28 14:48:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RIy8uM6fB6mcaNFziaNm8w
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2015-01-11 20:20:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:UACcveK90ImkQN/LMWtfAQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
-
-__PACKAGE__->belongs_to(artist => 'MyApps::Schema::Result::Artist', 'aid');
-
 1;

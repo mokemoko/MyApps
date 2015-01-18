@@ -30,6 +30,13 @@ Catalyst Controller.
 
 our $ua = LWP::UserAgent->new('agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0');
 
+our $support_extension = [
+  'jpg',
+  'png',
+  'gif',
+  'webm',
+];
+
 # サムネURLのみ取得
 sub getThumbs :Private {
   my ($self, $c) = @_;
@@ -128,8 +135,13 @@ sub getOriginURL {
   $thumb =~ s/^(.*)c\d?(\.san.*)preview\/(.*)$/$1cs$2$3/;
 
   # 存在チェック
-  $thumb =~ s/.jpg/.png/ unless $ua->head($thumb)->is_success;
-  $thumb =~ s/.png/.gif/ unless $ua->head($thumb)->is_success;
+  foreach my $extension (@$support_extension) {
+    $thumb =~ s/\.[^\/]*$/.$extension/;
+
+    if ($ua->head($thumb)->is_success) {
+      last;
+    }
+  }
 
   warn "ERROR: ORIGINAL IMAGE NOT FOUND $thumb" unless $ua->head($thumb)->is_success;
 
@@ -185,6 +197,7 @@ sub doTransrate :Private {
   foreach my $rec (@all) {
     my $gid = $rec->gid;
 
+    my $url = '';
     my $ou = $rec->original_url;
     my $path = $c->config->{image_writeout_dir} . $ou;
 
@@ -192,23 +205,17 @@ sub doTransrate :Private {
 
     warn "file($path) not found. retry getting image\n";
 
-    $ou =~ s/\.jpg/.png/;
-    $path =~ s/\.jpg/.png/;
-    my $url = $url_base . $ou;
-
-    unless ($ua->head($url)->is_success) {
-      warn "ERROR: can't download $url\n";
-      $ou =~ s/\.png/.gif/;
-      $path =~ s/\.png/.gif/;
+    foreach my $extension (@$support_extension) {
+      $ou =~ s/\.[^\/]*$/.$extension/;
       $url = $url_base . $ou;
 
-      unless ($ua->head($url)->is_success) {
-        warn "ERROR: can't download $url\n";
-        next;
+      if ($ua->head($url)->is_success) {
+        $path =~ s/\.[^\/]*$/.$extension/;
+        last;
       }
     }
 
-    $ua->get($url, ':content_file' => $path);
+    warn "ERROR: failed to download image $gid" unless $ua->get($url, ':content_file' => $path)->is_success;
 
     $rec->update({
         original_url  => $ou,

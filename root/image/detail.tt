@@ -7,4 +7,8 @@
   <a href="[% c.config.image_domain _ '/post/show/' _ image.gid %]">
     <img src="[% base _ image.original_url %]" />
   </a>
+  <p />
+  <a href="../list?mode=1&aid=[%  image.aid %]">
+    [% image.artist.name %]
+  </a>
 [% END %]

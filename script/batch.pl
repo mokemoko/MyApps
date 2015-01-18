@@ -5,7 +5,7 @@ use lib "$FindBin::RealBin/../lib";
 use MyApps;
 use Catalyst::Stats;
 
-my $target = $ARGV[0] || '';
+my $target = shift(@ARGV) || '';
 
 my $allow = {
   getImages => 1,
@@ -20,5 +20,4 @@ unless ($allow->{$target}) {
 }
 
 my $app = MyApps->new(stats => Catalyst::Stats->new);
-my @args = [];
-my $res = $app->forward("/batch/$target", @args);
+my $res = $app->forward("/batch/$target", [@ARGV]);

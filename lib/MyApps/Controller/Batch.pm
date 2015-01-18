@@ -36,7 +36,15 @@ sub getThumbs :Private {
   warn "start getThumbs\n";
 
   my $domain = $c->config->{image_domain};
-  my @artists = $c->model('Image::Artist')->all;
+
+  # 引数が指定されていた場合は対象を限定
+  my $query = scalar(@{$c->request->args}) ? {
+    name => {
+      -in => [@{$c->request->args}],
+    },
+  } : {};
+
+  my @artists = $c->model('Image::Artist')->search($query);
 
   foreach my $artist (@artists) {
     my $an = $artist->name;
@@ -121,8 +129,9 @@ sub getOriginURL {
 
   # 存在チェック
   $thumb =~ s/.jpg/.png/ unless $ua->head($thumb)->is_success;
+  $thumb =~ s/.png/.gif/ unless $ua->head($thumb)->is_success;
 
-  warn "ERROR: ORIGINAL IMAGE NOT FOUND $thumb" unless $ua->head($thumb);
+  warn "ERROR: ORIGINAL IMAGE NOT FOUND $thumb" unless $ua->head($thumb)->is_success;
 
   return $thumb;
 }

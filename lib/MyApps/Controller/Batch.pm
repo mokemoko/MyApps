@@ -57,6 +57,7 @@ sub getThumbs :Private {
     my $an = $artist->name;
     warn "start get $an thumbs\n";
 
+=head old
     eval {
       my $url = $domain . '/post/index?tags=' . $an;
       my $content = $ua->get($url)->content;
@@ -95,9 +96,56 @@ sub getThumbs :Private {
       $mt = $mt->delete;
       sleep 1;
     };
+=cut
+
+    # new
+    eval {
+      my $page = 1;
+      my $url_base = $domain . '/post/index.content?tags=' . $an . '&page=';
+
+      while(1) {
+        my $url = $url_base . $page;
+        my $content = $ua->get($url)->content;
+
+        my $scraper = scraper {
+          process 'span', 'items[]' => scraper {
+            process 'a', 'gid' => ['@href', sub {basename($_->path)}],
+            process 'a img', 'thumb' => ['@src', sub {$_->as_string}],
+          };
+        };
+        my $res = $scraper->scrape($content, $url);
+
+        last if !defined $res->{items} || scalar(@{$res->{items}}) < 1;
+
+        warn "process: ${page} page...\n";
+ 
+        foreach my $item (@{$res->{items}}) {
+          my ($gid, $thumb) = ($item->{gid}, $item->{thumb});
+
+          next if(!$gid || !$thumb);
+
+          # IDが既にDBに存在すれば飛ばす
+          next if ($c->model('Image::Image')->find({gid => $gid}));
+
+          my $ou = $self->getOriginURL($c, $thumb);
+
+          $c->model('Image::Image')->create({
+              gid => $gid,
+              aid => $artist->id,
+              thumb_url  => $self->saveImage($c, $thumb),
+              original_url  => $self->saveImage($c, $ou),
+            });
+          warn "insert $gid : $thumb\n";
+          sleep 1;
+        }
+        $page++;
+
+        last if (scalar(@{$c->request->args}) < 1 || $c->request->args->[0] ne 'all');
+      }
+    };
 
     if ($@) {
-      warn "NG: unexpected error has occured !!";
+      warn "NG: unexpected error has occured !! $@";
     }
   }
   warn "end getThumbs\n";
@@ -143,7 +191,7 @@ sub getOriginURL {
     }
   }
 
-  warn "ERROR: ORIGINAL IMAGE NOT FOUND $thumb" unless $ua->head($thumb)->is_success;
+  warn "ERROR: ORIGINAL IMAGE NOT FOUND $thumb\n" unless $ua->head($thumb)->is_success;
 
   return $thumb;
 }
@@ -215,7 +263,7 @@ sub doTransrate :Private {
       }
     }
 
-    warn "ERROR: failed to download image $gid" unless $ua->get($url, ':content_file' => $path)->is_success;
+    warn "ERROR: failed to download image $gid\n" unless $ua->get($url, ':content_file' => $path)->is_success;
 
     $rec->update({
         original_url  => $ou,
